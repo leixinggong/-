@@ -11,6 +11,7 @@
 #include <sys/select.h>
 #include <termios.h>
 #include <sys/ioctl.h>
+#include <time.h>
 
 
 int _kbhit()
@@ -38,6 +39,49 @@ typedef enum direction{
     RIGHT   = 100
 } Direct;
 
+typedef enum _level
+{
+    LEVELONE,LEVELTOW
+}Level;
+
+typedef struct _pos
+{
+    int x_;
+    int y_;
+}Pos;
+
+typedef struct _food
+{
+    Level level;
+    Pos pos;
+}Food;
+
+void initFood(Food * food)
+{
+    food->level = LEVELONE;
+    food->pos.x_ = rand() % 14 + 1;
+    food->pos.y_ = rand() % 14 + 1;
+}
+
+typedef enum _snaketype
+{
+    HEAD,
+    BODY,
+    TAIL
+}SnakeType;
+
+typedef struct _snake
+{
+    Pos pos;
+    SnakeType type;
+    struct _snake * next;
+    
+}Snake;
+
+void initSanke(Snake * sk)
+{
+    /// 判断初始化的食物蛇头 不在食物上
+}
 
 /// 方向k控制
 void getDirection()
@@ -52,14 +96,16 @@ void moveSnake()
 }
 
 /// 刷新界面
-void flushWindows()
+void flushWindows(Food * fd)
 {
     for (int i = 0; i < 16; i++)
     {
         for (int j = 0; j < 16; j++)
         {
             if (i == 0 || i == 15 || j == 0 || j ==15)
-                printf(" #");
+                printf(" @");
+            else if (fd->pos.x_ == i && fd->pos.y_ == j)
+                printf("🔥");
             else
                 printf("  ");
         }
@@ -74,6 +120,12 @@ int main(int argc, const char * argv[]) {
 //    system("stty -icanon");
 //    a = getchar();
     
+
+    
+    srand((unsigned int)time(NULL));
+    Food fd;
+    initFood(&fd);
+    
     while (1)
     {
         system("clear");
@@ -81,7 +133,7 @@ int main(int argc, const char * argv[]) {
         
         moveSnake();
         
-        flushWindows();
+        flushWindows(&fd);
     }
     
     return 0;
